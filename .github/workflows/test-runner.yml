@@ -1,0 +1,35 @@
+name: Test Self-Hosted Runner
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test-runner:
+    runs-on: [self-hosted, azure-runner]
+
+    steps:
+      - name: Runner Information
+        run: |
+          echo "===== Runner Information ====="
+          echo "Hostname:"
+          hostname
+
+          echo "User:"
+          whoami
+
+          echo "OS:"
+          uname -a
+
+          echo "Architecture:"
+          uname -m
+
+          echo "Working directory:"
+          pwd
+
+      - name: Test Git
+        run: |
+          git --version
+
+      - name: Test Network
+        run: |
+          curl -I https://github.com
