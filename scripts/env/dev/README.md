@@ -179,11 +179,15 @@ git clone <RUNNER-SETUP-REPOSITORY-URL>
 ```
 Example:
 ```bash
-git clone https://github.com/<organization>/github-runner-setup.git
+git clone https://github.com/Suhashb12/github-vm-runner.git
 ```
 Move into the repository:
 ```bash
-cd github-runner-setup
+cd github-vm-runner
+```
+Change Directory path : ~/scripts/env/dev
+```bash
+cd scripts/env/dev
 ```
 Verify the files:
 ```bash
@@ -266,6 +270,11 @@ When prompted:
 ```bash
 Registration token:
 ```
+Example:
+```bash
+ATXXXXXXX54QXXXXXXMPKXXXXXXCQ
+```
+
 Paste the temporary registration token obtained from GitHub.
 
 The token should not be committed or stored in the repository.
