@@ -126,9 +126,10 @@ Do not:
 * Store the token in a configuration file
 
 The token should only be entered when the script requests it.
+
 ---
 ## Steps to Perform on the VM
----
+
 ### Step 1: Connect to the VM
 
 Connect to the private VM using Azure Bastion.
