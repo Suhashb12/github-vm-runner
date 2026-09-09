@@ -36,7 +36,7 @@ RUNNER_LABELS="${RUNNER_LABELS:-azure-runner,dev}"
 echo
 echo "Enter the temporary GitHub Actions runner registration token."
 echo "You can obtain it from:"
-echo "GitHub → Repository → Settings → Actions → Runners → New self-hosted runner"
+echo "GitHub -> Repository -> Settings -> Actions -> Runners -> New self-hosted runner"
 echo
 
 read -rsp "Registration token: " RUNNER_TOKEN
@@ -88,7 +88,7 @@ chown -R "${RUNNER_USER}:${RUNNER_USER}" "/home/${RUNNER_USER}"
 # 5. Determine latest runner version
 # --------------------------------------------------
 
-echo "[3/7] Detecting latest GitHub Actions Runner..."
+echo "[3/7] Detecting latest runner version..."
 
 RUNNER_VERSION="$(
   curl -fsSL \
@@ -129,6 +129,7 @@ RUNNER_PACKAGE="actions-runner-linux-${RUNNER_ARCH}-${RUNNER_VERSION}.tar.gz"
 RUNNER_URL="https://github.com/actions/runner/releases/download/v${RUNNER_VERSION}/${RUNNER_PACKAGE}"
 
 if [[ ! -f "${RUNNER_DIR}/run.sh" ]]; then
+
   sudo -u "${RUNNER_USER}" \
     curl -fL "${RUNNER_URL}" \
     -o "${RUNNER_DIR}/${RUNNER_PACKAGE}"
@@ -138,6 +139,9 @@ if [[ ! -f "${RUNNER_DIR}/run.sh" ]]; then
     -C "${RUNNER_DIR}"
 
   rm -f "${RUNNER_DIR}/${RUNNER_PACKAGE}"
+
+else
+  echo "GitHub Actions Runner is already downloaded."
 fi
 
 chown -R "${RUNNER_USER}:${RUNNER_USER}" "${RUNNER_DIR}"
@@ -160,9 +164,12 @@ if [[ ! -f "${RUNNER_DIR}/.runner" ]]; then
       --replace
 
 else
+
   echo "Runner is already configured."
+
 fi
 
+# Remove token from shell environment
 unset RUNNER_TOKEN
 
 # --------------------------------------------------
@@ -173,13 +180,48 @@ echo "[6/7] Installing runner service..."
 
 cd "${RUNNER_DIR}"
 
-if [[ ! -f /etc/systemd/system/actions.runner.service ]]; then
+# Install service only if it does not already exist
+if ! ls /etc/systemd/system/actions.runner.*.service >/dev/null 2>&1; then
+
   ./svc.sh install "${RUNNER_USER}"
+
+else
+
+  echo "Runner service already exists."
+
 fi
 
 systemctl daemon-reload
-systemctl enable actions.runner.service
-systemctl restart actions.runner.service
+
+# --------------------------------------------------
+# Find actual GitHub Actions runner service
+# --------------------------------------------------
+
+RUNNER_SERVICE="$(
+  systemctl list-unit-files \
+    'actions.runner.*.service' \
+    --no-legend \
+    | awk '{print $1}' \
+    | head -n 1
+)"
+
+if [[ -z "${RUNNER_SERVICE}" ]]; then
+  echo "ERROR: Could not find GitHub Actions runner systemd service."
+  echo
+  echo "Available runner services:"
+  systemctl list-unit-files | grep 'actions.runner' || true
+  exit 1
+fi
+
+echo "Runner service detected:"
+echo "${RUNNER_SERVICE}"
+
+# --------------------------------------------------
+# Enable and start service
+# --------------------------------------------------
+
+systemctl enable "${RUNNER_SERVICE}"
+systemctl restart "${RUNNER_SERVICE}"
 
 # --------------------------------------------------
 # 9. Verify
@@ -189,7 +231,8 @@ echo "[7/7] Verifying runner..."
 
 sleep 5
 
-if systemctl is-active --quiet actions.runner.service; then
+if systemctl is-active --quiet "${RUNNER_SERVICE}"; then
+
   echo
   echo "=========================================="
   echo " Runner setup completed successfully"
@@ -198,13 +241,17 @@ if systemctl is-active --quiet actions.runner.service; then
   echo "Runner name : ${RUNNER_NAME}"
   echo "Repository  : ${GITHUB_REPO}"
   echo "Labels      : ${RUNNER_LABELS}"
+  echo "Service     : ${RUNNER_SERVICE}"
   echo
-  echo "Service:"
-  systemctl --no-pager --full status actions.runner.service
+  echo "Service status:"
+  systemctl --no-pager --full status "${RUNNER_SERVICE}"
+
 else
+
   echo
   echo "ERROR: Runner service is not running."
   echo
-  systemctl --no-pager --full status actions.runner.service || true
+  systemctl --no-pager --full status "${RUNNER_SERVICE}" || true
   exit 1
+
 fi
