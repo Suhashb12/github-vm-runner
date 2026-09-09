@@ -1,0 +1,28 @@
+
+## One important thing for a public repo
+
+Since this will be **public**, I'd also add a `.gitignore` that excludes things such as:
+
+```gitignore
+# Secrets
+.env
+*.pem
+*.key
+credentials*
+secrets*
+
+# Runner configuration
+.runner
+.credentials
+.credentials_rsaparams
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Temporary files
+tmp/
+temp/
