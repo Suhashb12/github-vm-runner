@@ -217,17 +217,18 @@ sudo ./setup-runner.sh
 ```
 The script will ask for the following information.
 
-GitHub Repository URL
+#### GitHub Repository URL
 
 Example:
-
-GitHub repository URL:
 ```bash
+GitHub repository URL:
 https://github.com/my-org/my-repository
 ```
 Enter the repository where the runner should be registered.
 
-Runner Name
+---
+
+#### Runner Name
 
 Example:
 ```bash
@@ -239,7 +240,9 @@ dev-vm-runner-poc
 ```
 or provide another unique name.
 
-Runner Labels
+---
+
+#### Runner Labels
 
 Example:
 ```bash
@@ -254,8 +257,11 @@ These labels can later be used in GitHub Actions workflows.
 Example:
 ```bash
 runs-on: [self-hosted, azure-runner]
-Runner Registration Token
 ```
+---
+
+#### Runner Registration Token
+
 When prompted:
 ```bash
 Registration token:
@@ -269,16 +275,16 @@ The token should not be committed or stored in the repository.
 
 The script will automatically:
 
-Install required packages.
-Create the github-runner user.
-Detect the VM architecture.
-Download the GitHub Actions Runner.
-Extract the runner.
-Register the runner with GitHub.
-Configure the runner as a service.
-Enable the service at boot.
-Start the runner.
-Verify the runner service.
+1. Install required packages.
+2. Create the github-runner user.
+3. Detect the VM architecture.
+4. Download the GitHub Actions Runner.
+5. Extract the runner.
+6. Register the runner with GitHub.
+7. Configure the runner as a service.
+8. Enable the service at boot.
+9. Start the runner.
+10. Verify the runner service.
 
 No additional manual installation should be required.
 
@@ -365,19 +371,23 @@ GitHub
 ```
 The workflow should execute on the private VM.
 
-Runner User
+---
+#### Runner User
 
 The runner is configured using a dedicated Linux user:
-
+```bash
 github-runner
-
+```
 The runner should not run as root.
 
 Runner files are located at:
 ```bash
 /home/github-runner/actions-runner
-Network Architecture
 ```
+
+---
+#### Network Architecture
+
 The self-hosted runner only requires outbound connectivity to GitHub.
 ```bash
                     GitHub
@@ -400,31 +410,33 @@ The self-hosted runner only requires outbound connectivity to GitHub.
                       AKS
 ```
 
+---
 #### Service Management
-Check Service
+##### Check Service
 ```bash
 sudo systemctl status actions.runner.service
 ```
-Restart Service
+##### Restart Service
 ```bash
 sudo systemctl restart actions.runner.service
 ```
-Stop Service
+##### Stop Service
 ```bash
 sudo systemctl stop actions.runner.service
 ```
-Start Service
+##### Start Service
 ```bash
 sudo systemctl start actions.runner.service
 ```
-View Logs
+##### View Logs
 ```bash
 sudo journalctl -u actions.runner.service -f
 ```
+
+---
 #### Troubleshooting
-```bash
-GitHub Runner is Offline
-```
+
+##### GitHub Runner is Offline
 
 Check the VM's Internet connectivity:
 ```bash
@@ -435,9 +447,11 @@ Check the runner service:
 sudo systemctl status actions.runner.service
 ```
 Check service logs:
-
+```bash
 sudo journalctl -u actions.runner.service -n 100
-Runner Registration Failed
+```
+---
+#### Runner Registration Failed
 
 Verify:
 
@@ -446,7 +460,9 @@ You have permission to add self-hosted runners.
 The registration token is from the correct repository.
 The registration token has not expired.
 The VM can reach GitHub.
-Runner Cannot Connect to GitHub
+
+---
+#### Runner Cannot Connect to GitHub
 
 Test:
 ```bash
@@ -458,26 +474,28 @@ curl -I https://api.github.com
 ```
 If the VM is in a private Azure subnet, verify that outbound Internet connectivity is configured.
 
+---
 #### Security Considerations
 
 The runner registration token is temporary and must be treated as a secret.
 
 Never commit:
-
+```bash
 GitHub PAT
 Runner registration token
 GitHub credentials
 Private SSH keys
 Azure credentials
-
+```
 The runner should run under the dedicated:
-
+```bash
 github-runner
-
+```
 Linux user.
 
 The VM does not require a public IP or inbound Internet access.
 
+---
 #### Cleanup
 
 When the VM or runner is no longer required, remove the runner from GitHub before permanently deleting the VM.
@@ -493,3 +511,4 @@ GitHub Repository
                 +-- Runners
 ```
 Select the runner and remove it.
+---
