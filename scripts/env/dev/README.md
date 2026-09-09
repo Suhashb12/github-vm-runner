@@ -77,7 +77,7 @@ Private VM
 
 ---
 
-4. GitHub Repository
+### 4. GitHub Repository
 
 You need access to the GitHub repository where the self-hosted runner will be registered.
 
@@ -89,8 +89,10 @@ Example:
 ```bash
 https://github.com/<organization>/<repository>
 ```
+
 ---
-5. GitHub Runner Registration Token
+
+### 5. GitHub Runner Registration Token
 
 Before running the script, obtain a temporary GitHub Actions runner registration token.
 
