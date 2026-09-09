@@ -327,7 +327,7 @@ Online
 ```
 
 ---
-Test the Runner
+#### Test the Runner
 
 Create a temporary GitHub Actions workflow:
 ```bash
@@ -400,7 +400,7 @@ The self-hosted runner only requires outbound connectivity to GitHub.
                       AKS
 ```
 
-Service Management
+#### Service Management
 Check Service
 ```bash
 sudo systemctl status actions.runner.service
@@ -421,7 +421,7 @@ View Logs
 ```bash
 sudo journalctl -u actions.runner.service -f
 ```
-Troubleshooting
+#### Troubleshooting
 ```bash
 GitHub Runner is Offline
 ```
@@ -458,7 +458,7 @@ curl -I https://api.github.com
 ```
 If the VM is in a private Azure subnet, verify that outbound Internet connectivity is configured.
 
-Security Considerations
+#### Security Considerations
 
 The runner registration token is temporary and must be treated as a secret.
 
@@ -478,7 +478,7 @@ Linux user.
 
 The VM does not require a public IP or inbound Internet access.
 
-Cleanup
+#### Cleanup
 
 When the VM or runner is no longer required, remove the runner from GitHub before permanently deleting the VM.
 
