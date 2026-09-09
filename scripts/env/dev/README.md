@@ -155,4 +155,316 @@ Expected architecture:
 ```bash
 x86_64
 ```
-----
+---
+
+Step 2: Verify Internet Connectivity
+
+Run:
+
+curl -I https://github.com
+
+Also test GitHub's API:
+
+curl -I https://api.github.com
+
+Both commands should return an HTTP response.
+
+If these fail, verify the VM's outbound network connectivity before continuing.
+
+Step 3: Clone This Repository
+
+Clone this repository on the VM:
+
+git clone <RUNNER-SETUP-REPOSITORY-URL>
+
+Example:
+
+git clone https://github.com/<organization>/github-runner-setup.git
+
+Move into the repository:
+
+cd github-runner-setup
+
+Verify the files:
+
+ls -la
+
+You should see:
+
+setup-runner.sh
+README.md
+Step 4: Make the Script Executable
+
+Run:
+
+chmod +x setup-runner.sh
+
+Verify:
+
+ls -l setup-runner.sh
+
+The script should have executable permissions.
+
+Step 5: Run the Setup Script
+
+Run:
+
+sudo ./setup-runner.sh
+
+The script will ask for the following information.
+
+GitHub Repository URL
+
+Example:
+
+GitHub repository URL:
+https://github.com/my-org/my-repository
+
+Enter the repository where the runner should be registered.
+
+Runner Name
+
+Example:
+
+Runner name [dev-vm-runner-poc]:
+
+You can use:
+
+dev-vm-runner-poc
+
+or provide another unique name.
+
+Runner Labels
+
+Example:
+
+Runner labels [azure-runner,dev]:
+
+You can use:
+
+azure-runner,dev
+
+These labels can later be used in GitHub Actions workflows.
+
+Example:
+
+runs-on: [self-hosted, azure-runner]
+Runner Registration Token
+
+When prompted:
+
+Registration token:
+
+Paste the temporary registration token obtained from GitHub.
+
+The token should not be committed or stored in the repository.
+
+Step 6: Wait for Installation
+
+The script will automatically:
+
+Install required packages.
+Create the github-runner user.
+Detect the VM architecture.
+Download the GitHub Actions Runner.
+Extract the runner.
+Register the runner with GitHub.
+Configure the runner as a service.
+Enable the service at boot.
+Start the runner.
+Verify the runner service.
+
+No additional manual installation should be required.
+
+Step 7: Verify the Runner Service
+
+After the script completes, check the runner service.
+
+The script will display the service status.
+
+You can also verify the runner process:
+
+ps aux | grep Runner.Listener
+
+Check the runner directory:
+
+ls -la /home/github-runner/actions-runner
+Step 8: Verify the Runner in GitHub
+
+Go to:
+
+GitHub Repository
+    |
+    +-- Settings
+          |
+          +-- Actions
+                |
+                +-- Runners
+
+The VM should appear as an available self-hosted runner.
+
+Example:
+
+dev-vm-runner-poc
+
+The runner should show as:
+
+Idle
+
+or:
+
+Online
+Test the Runner
+
+Create a temporary GitHub Actions workflow:
+
+name: Test Self-Hosted Runner
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test-runner:
+    runs-on: [self-hosted, azure-runner]
+
+    steps:
+      - name: Runner Information
+        run: |
+          echo "Hostname:"
+          hostname
+
+          echo "Current User:"
+          whoami
+
+          echo "Operating System:"
+          uname -a
+
+          echo "Working Directory:"
+          pwd
+
+Run the workflow manually from:
+
+GitHub
+  → Actions
+  → Test Self-Hosted Runner
+  → Run workflow
+
+The workflow should execute on the private VM.
+
+Runner User
+
+The runner is configured using a dedicated Linux user:
+
+github-runner
+
+The runner should not run as root.
+
+Runner files are located at:
+
+/home/github-runner/actions-runner
+Network Architecture
+
+The self-hosted runner only requires outbound connectivity to GitHub.
+
+                    GitHub
+                       ^
+                       |
+                 HTTPS / Outbound
+                       |
+                       |
+              +-------------------+
+              | Private VM        |
+              |                   |
+              | GitHub Actions    |
+              | Self-Hosted Runner|
+              +-------------------+
+                       |
+                       X
+                       |
+                       X
+                       |
+                      AKS
+
+There is intentionally no VM-to-AKS network connection in this setup.
+
+Service Management
+Check Service
+sudo systemctl status actions.runner.service
+Restart Service
+sudo systemctl restart actions.runner.service
+Stop Service
+sudo systemctl stop actions.runner.service
+Start Service
+sudo systemctl start actions.runner.service
+View Logs
+sudo journalctl -u actions.runner.service -f
+Troubleshooting
+GitHub Runner is Offline
+
+Check the VM's Internet connectivity:
+
+curl -I https://github.com
+
+Check the runner service:
+
+sudo systemctl status actions.runner.service
+
+Check service logs:
+
+sudo journalctl -u actions.runner.service -n 100
+Runner Registration Failed
+
+Verify:
+
+The GitHub repository URL is correct.
+You have permission to add self-hosted runners.
+The registration token is from the correct repository.
+The registration token has not expired.
+The VM can reach GitHub.
+Runner Cannot Connect to GitHub
+
+Test:
+
+curl -I https://github.com
+
+and:
+
+curl -I https://api.github.com
+
+If the VM is in a private Azure subnet, verify that outbound Internet connectivity is configured.
+
+Security Considerations
+
+The runner registration token is temporary and must be treated as a secret.
+
+Never commit:
+
+GitHub PAT
+Runner registration token
+GitHub credentials
+Private SSH keys
+Azure credentials
+
+The runner should run under the dedicated:
+
+github-runner
+
+Linux user.
+
+The VM does not require a public IP or inbound Internet access.
+
+Cleanup
+
+When the VM or runner is no longer required, remove the runner from GitHub before permanently deleting the VM.
+
+Go to:
+
+GitHub Repository
+    |
+    +-- Settings
+          |
+          +-- Actions
+                |
+                +-- Runners
+
+Select the runner and remove it.
