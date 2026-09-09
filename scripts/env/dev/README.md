@@ -156,8 +156,7 @@ Expected architecture:
 x86_64
 ```
 ---
-
-Step 2: Verify Internet Connectivity
+### Step 2: Verify Internet Connectivity
 
 Run:
 
@@ -170,8 +169,8 @@ curl -I https://api.github.com
 Both commands should return an HTTP response.
 
 If these fail, verify the VM's outbound network connectivity before continuing.
-
-Step 3: Clone This Repository
+---
+### Step 3: Clone This Repository
 
 Clone this repository on the VM:
 
@@ -193,7 +192,8 @@ You should see:
 
 setup-runner.sh
 README.md
-Step 4: Make the Script Executable
+---
+### Step 4: Make the Script Executable
 
 Run:
 
@@ -204,8 +204,8 @@ Verify:
 ls -l setup-runner.sh
 
 The script should have executable permissions.
-
-Step 5: Run the Setup Script
+---
+### Step 5: Run the Setup Script
 
 Run:
 
@@ -258,8 +258,8 @@ Registration token:
 Paste the temporary registration token obtained from GitHub.
 
 The token should not be committed or stored in the repository.
-
-Step 6: Wait for Installation
+---
+### Step 6: Wait for Installation
 
 The script will automatically:
 
@@ -275,8 +275,8 @@ Start the runner.
 Verify the runner service.
 
 No additional manual installation should be required.
-
-Step 7: Verify the Runner Service
+---
+### Step 7: Verify the Runner Service
 
 After the script completes, check the runner service.
 
@@ -289,7 +289,8 @@ ps aux | grep Runner.Listener
 Check the runner directory:
 
 ls -la /home/github-runner/actions-runner
-Step 8: Verify the Runner in GitHub
+---
+### Step 8: Verify the Runner in GitHub
 
 Go to:
 
@@ -314,6 +315,8 @@ Idle
 or:
 
 Online
+
+---
 Test the Runner
 
 Create a temporary GitHub Actions workflow:
