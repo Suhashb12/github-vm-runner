@@ -55,3 +55,102 @@ The VM does not require:
 * Network connectivity to AKS
 
 The VM only needs outbound connectivity to GitHub.
+
+---
+
+### 3. Access to the VM
+
+You need administrator/sudo access to the VM.
+
+For a private Azure VM, you can access it through Azure Bastion.
+
+Example:
+```bash
+Your Machine
+     |
+     v
+Azure Bastion
+     |
+     v
+Private VM
+```
+
+---
+
+4. GitHub Repository
+
+You need access to the GitHub repository where the self-hosted runner will be registered.
+
+You must have permission to add self-hosted runners.
+
+The repository URL will be provided to the setup script.
+
+Example:
+```bash
+https://github.com/<organization>/<repository>
+```
+---
+5. GitHub Runner Registration Token
+
+Before running the script, obtain a temporary GitHub Actions runner registration token.
+
+Navigate to:
+```bash
+GitHub Repository
+    |
+    +-- Settings
+          |
+          +-- Actions
+                |
+                +-- Runners
+                      |
+                      +-- New self-hosted runner
+```
+
+Select:
+```bash
+Linux
+x64
+```
+GitHub will display the runner setup instructions and a temporary registration token.
+
+Keep the token available because the setup script will ask for it.
+
+#### Security
+
+Do not:
+
+* Commit the token to Git
+* Put the token in setup-runner.sh
+* Put the token in Terraform
+* Store the token in a configuration file
+
+The token should only be entered when the script requests it.
+---
+## Steps to Perform on the VM
+---
+### Step 1: Connect to the VM
+
+Connect to the private VM using Azure Bastion.
+
+Example VM:
+```bash
+dev-vm-runner-poc
+```
+After connecting, verify the VM:
+```bash
+hostname
+```
+Check the operating system:
+```bash
+cat /etc/os-release
+```
+Check the architecture:
+```bash
+uname -m
+```
+Expected architecture:
+```bash
+x86_64
+```
+----
